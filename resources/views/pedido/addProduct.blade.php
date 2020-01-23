@@ -14,8 +14,13 @@
                     @endif
                     <form action="{{route('pedido.addProduct')}}" method="POST">
                         @csrf
-                        Id do Pedido: <input type="text" name="pedido_id" value="{{$pedido['id']}}" readonly=“true”><br>
-                        Id do Produto: <input type="text" name="produto_id"><br>
+                        <input type="hidden" name="pedido_id" value="{{$pedido['id']}}" readonly=“true”><br>
+                        Produto: 
+                        <select class="form-control" id="exampleFormControlSelect1" style="width:200px" name="produto_id"> 
+                        @foreach($produtos as $p)
+                            <option value="{{$p->id}}">{{$p['nome']}}</option>
+                            @endforeach
+                        </select>
                         Quantidade: <input type="text" name="quantidade"><br>
 
                         <input type="submit" value="salvar">
