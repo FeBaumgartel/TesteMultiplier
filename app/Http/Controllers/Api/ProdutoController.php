@@ -14,12 +14,15 @@ class ProdutoController extends Controller
         return response()->json(["data" => Produto::all()->where([
             ['updated_at', '>=', Sincronizacao::max('sincronizacao')],
         ])]);
+        // saveSync();
     }
+    
     public function getDeletedProdutos()
     {
         return response()->json(["data" => Produto::onlyTrashed()->where([
             ['deleted_at', '>=', Sincronizacao::max('sincronizacao')],
         ])]);
+        // saveSync();
     }
 
     public function postProdutos(Request $request)
@@ -31,22 +34,36 @@ class ProdutoController extends Controller
             $produto->peso = $p->peso;
             $produto->save();
         }
+        // saveSync();
 
         return response()->json("Sucesso");
     }
 
-    public function putProdutos($produtos)
+    public function putProdutos(Request $request)
     {
-        $produto = Produto::find($produtos->id);
-        $produto->nome = $produtos->nome;
-        $produto->preco = $produtos->preco;
-        $produto->peso = $produtos->peso;
-        $produto->updated_at = $produtos->updated_at;
-        $produto->save();
+        foreach ($request->produtos as $p) {
+            $produto = Produto::find($p->id);
+            $produto->nome = $p->nome;
+            $produto->preco = $p->preco;
+            $produto->peso = $p->peso;
+            $produto->updated_at = $p->updated_at;
+            $produto->save();
+        }
+        // saveSync();
     }
 
-    public function deleteProdutos($produtos)
+    public function deleteProdutos(Request $request)
     {
-        Produto::delete($produtos->id);
+        foreach ($request->produtos as $p) {
+            Produto::delete($p->id);
+        }
+        // saveSync();
+    }
+
+    public function saveSync()
+    {
+        $sinc = new Sincronizacao();
+        $sinc->sincronizacao = (new \DateTime())->format('Y-m-d H:i:s');
+        $sinc->save();
     }
 }
