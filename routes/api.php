@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Symfony\Component\Mime\Header\Headers;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,5 +14,9 @@ use Illuminate\Http\Request;
 |
 */
 
-
-Route::post('produto','ProdutoController@teste');
+header('Access-Control-Allow-Origin:*');
+Route::get('produto','ProdutoController@getProdutos');
+Route::get('produto/deleted','ProdutoController@getDeletedProdutos');
+Route::post('produto','ProdutoController@postProdutos');
+Route::put('produto','ProdutoController@putProdutos');
+Route::delete('produto','ProdutoController@deleteProdutos');
