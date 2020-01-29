@@ -6,35 +6,31 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Produto;
 use App\Sincronizacao;
+use Log;
 
 class ProdutoController extends Controller
 {
     public function getProdutos()
     {
-        return response()->json(["data" => Produto::all()->where([
-            ['updated_at', '>=', Sincronizacao::max('sincronizacao')],
-        ])]);
-        // saveSync();
+        return response()->json(["data" => Produto::all()]);
     }
-    
+
     public function getDeletedProdutos()
     {
-        return response()->json(["data" => Produto::onlyTrashed()->where([
-            ['deleted_at', '>=', Sincronizacao::max('sincronizacao')],
-        ])]);
-        // saveSync();
+        return response()->json(["data" => Produto::onlyTrashed()->get()]);
     }
 
     public function postProdutos(Request $request)
     {
+        Log::debug($request);
+
         foreach ($request->produtos as $p) {
             $produto = new Produto();
-            $produto->nome = $p->nome;
-            $produto->preco = $p->preco;
-            $produto->peso = $p->peso;
+            $produto->nome = $p["nome"];
+            $produto->preco = $p["preco"];
+            $produto->peso = $p["peso"];
             $produto->save();
         }
-        // saveSync();
 
         return response()->json("Sucesso");
     }
@@ -49,7 +45,6 @@ class ProdutoController extends Controller
             $produto->updated_at = $p->updated_at;
             $produto->save();
         }
-        // saveSync();
     }
 
     public function deleteProdutos(Request $request)
@@ -57,13 +52,5 @@ class ProdutoController extends Controller
         foreach ($request->produtos as $p) {
             Produto::delete($p->id);
         }
-        // saveSync();
-    }
-
-    public function saveSync()
-    {
-        $sinc = new Sincronizacao();
-        $sinc->sincronizacao = (new \DateTime())->format('Y-m-d H:i:s');
-        $sinc->save();
     }
 }
