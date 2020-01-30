@@ -22,35 +22,50 @@ class ProdutoController extends Controller
 
     public function postProdutos(Request $request)
     {
-        Log::debug($request);
+        $id = 0;
+        $produtos = json_decode($request->produtos, true);
 
-        foreach ($request->produtos as $p) {
-            $produto = new Produto();
-            $produto->nome = $p["nome"];
-            $produto->preco = $p["preco"];
-            $produto->peso = $p["peso"];
-            $produto->save();
+        foreach ($produtos as $p) {
+            if (is_null($p["id"])) {
+                $produto = new Produto();
+                $produto->nome = $p["nome"];
+                $produto->preco = $p["preco"];
+                $produto->peso = $p["peso"];
+                $produto->save();
+                $id=Produto::whereRaw('id = (select max(`id`) from produtos)')->get();
+            } else {
+                $id = $p["id"];
+                $produto = Produto::find($p["id"]);
+                $produto->nome = $p["nome"];
+                $produto->preco = $p["preco"];
+                $produto->peso = $p["peso"];
+                $produto->save();
+            }
         }
 
-        return response()->json("Sucesso");
+        return response()->json($id);
     }
 
     public function putProdutos(Request $request)
     {
-        foreach ($request->produtos as $p) {
-            $produto = Produto::find($p->id);
-            $produto->nome = $p->nome;
-            $produto->preco = $p->preco;
-            $produto->peso = $p->peso;
-            $produto->updated_at = $p->updated_at;
+        $produtos = json_decode($request->produtos, true);
+
+        foreach ($produtos as $p) {
+            $produto = Produto::find($p["id"]);
+            $produto->nome = $p["nome"];
+            $produto->preco = $p["preco"];
+            $produto->peso = $p["peso"];
+            $produto->updated_at = $p["updated_at"];
             $produto->save();
         }
     }
 
     public function deleteProdutos(Request $request)
     {
-        foreach ($request->produtos as $p) {
-            Produto::delete($p->id);
+        $produtos = json_decode($request->produtos, true);
+
+        foreach ($produtos as $p) {
+            Produto::destroy($p["id"]);
         }
     }
 }

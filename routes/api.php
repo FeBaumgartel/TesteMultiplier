@@ -19,4 +19,4 @@ Route::get('produto','ProdutoController@getProdutos');
 Route::get('produto/deleted','ProdutoController@getDeletedProdutos');
 Route::post('produto','ProdutoController@postProdutos');
 Route::put('produto','ProdutoController@putProdutos');
-Route::delete('produto','ProdutoController@deleteProdutos');
+Route::post('produto/delete','ProdutoController@deleteProdutos');
