@@ -32,14 +32,17 @@ class ProdutoController extends Controller
                 $produto->preco = $p["preco"];
                 $produto->peso = $p["peso"];
                 $produto->save();
-                $id=Produto::whereRaw('id = (select max(`id`) from produtos)')->get();
+                $id = Produto::whereRaw('id = (select max(`id`) from produtos)')->get();
             } else {
                 $id = $p["id"];
                 $produto = Produto::find($p["id"]);
-                $produto->nome = $p["nome"];
-                $produto->preco = $p["preco"];
-                $produto->peso = $p["peso"];
-                $produto->save();
+                if ($produto->updated_at < $p["updated_at"]) {
+                    $produto->nome = $p["nome"];
+                    $produto->preco = $p["preco"];
+                    $produto->peso = $p["peso"];
+                    $produto->updated_at = $p["updated_at"];
+                    $produto->save();
+                }
             }
         }
 
